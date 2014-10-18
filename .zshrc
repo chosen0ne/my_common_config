@@ -99,8 +99,10 @@ LOCAL_MANPATH="/Users/louzhenlin/dev/man"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# commands
 alias ll="ls -al"
 alias grep="grep --color"
+alias rm="safe_rm"
 
 alias g108="ssh root@202.205.91.108"
 alias g107="ssh root@202.205.91.107"
@@ -150,4 +152,96 @@ function clines() {
     lines=`expr $cc_line + $h_line`
     echo $lines
 }
+
+# kill process by name
+function kpn() {
+    ps axu | grep $1 | grep -v grep | awk '{print $2}' | xargs kill
+}
+
+# safe rm
+# Don't remove the file, just move them to a temporary directory.
+# Files are grouped by remove time.
+# e.g.
+#   # pwd => /home/work/
+#   > rm -r -f aa
+#   'aa' will move to ~/.TrashHistory/20141018/aa@120111@_home_work_aa
+RM_BACKUP_PATH=/Users/louzhenlin/.TrashHistory
+function safe_rm() {
+    # skip cmd option, e.g. '-rf' in 'rm -rf a b' or '-r/-f' in 'rm -r -f a b'
+    first_char=${1:0:1}
+    until [ ! "$first_char" = "-" ]
+    do
+        shift
+        first_char=${1:0:1}
+    done
+
+    # check param
+    if [ $# -lt 1 ]; then
+        echo 'usage: rm [-f | -i] [-dPRrvW] file ...'
+        exit 1
+    fi
+
+    today=`date +"%Y%m%d"`
+    mvpath=${RM_BACKUP_PATH}/$today
+
+    # support for multi version
+    timestamp=`date +"%H%M%S"`
+
+    # create dir if path non-exist
+    if [ ! -d $mvpath ]; then
+        mkdir $mvpath
+    fi
+
+    until [ $# -eq 0 ]
+    do
+        # fetch absolute path of the file
+        fpath=$1
+        fchar=`echo "${fpath:0:1}"`
+        if [ "$fchar" = "/" ]; then
+            dist_path="_${fpath}"
+        else
+            abs_fpath=`pwd`/$fpath
+            dist_path="${fpath}@${timestamp}@${abs_fpath}"
+        fi
+
+        # substitue '/' to '_'
+        final_dist_path=${dist_path//\//_}
+
+        # mv to temp trash
+        mv $fpath $mvpath/$final_dist_path
+
+        # next file
+        shift
+    done
+}
+
+
+# revert files that remove by safe_rm
+# you can choose the right one in multi files removed
+function revert_rm() {
+    cd $RM_BACKUP_PATH
+
+    # process multi files
+    until [ $# -eq 0 ]
+    do
+        echo "revert for $1:"
+        for f in `find . -name "$1@*" -print`
+        do
+            d=`echo $f | awk -F\/ '{print $2}'`
+            t=`echo $f | awk -F@ '{print $2}'`
+            fpath=`echo $f | awk -F@ '{print $3}'`
+            fpath=${fpath//_/\/}
+
+            echo -n "      $fpath at ${d:0:4}-${d:4:2}-${d:6:2} ${t:0:2}:${t:2:2}:${t:4:2}   [y/n]? "
+            read confirm
+            if [ "${confirm}" = 'y' ]; then
+                mv $f $fpath
+                break
+            fi
+        done
+
+        shift
+    done
+}
+
 
