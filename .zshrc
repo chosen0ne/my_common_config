@@ -5,6 +5,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
+# bira, bureau, rkj-repos, gnzh
 ZSH_THEME="robbyrussell"
 
 # Uncomment the following line to use case-sensitive completion.
@@ -45,30 +46,111 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git, brew, mvn, npm, python, redis-cli, ruby, sbt, svn, tmux, rsync, golang)
 
 source $ZSH/oh-my-zsh.sh
+
+export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
 
 # User configuration
 
 export GOROOT=/usr/local/go
-export GOPATH=/Users/louzhenlin/dev/workspace/go/
+export GOSRC=/usr/local/go/src/pkg
+
+export GOPATH=/Users/louzhenlin/dev/workspace/go
 
 # APP HOME
-export NSQHOME="/Users/louzhenlin/dev/server/nsq-0.2.31.darwin-amd64.go1.3.1"
-export NODEHOME="/Users/louzhenlin/dev/app/node-v0.10.32-darwin-x64"
-export REDISHOME="/Users/louzhenlin/dev/server/redis-2.8.17"
+export JAVA_HOME=`/usr/libexec/java_home`
+export MAVEN_HOME=/Users/louzhenlin/dev/downloads/apache-maven-3.2.3
+export LUA_HOME=/Users/louzhenlin/dev/app/lua-5.2.3
+export BTRACE_HOME=/Users/louzhenlin/dev/tools/btrace
+export ZOOKEEPER_HOME=/Users/louzhenlin/dev/server/zookeeper-3.4.6
+export NSQ_HOME=/Users/louzhenlin/dev/server/nsq-0.2.31.darwin-amd64.go1.3.1
+export NODE_HOME=/Users/louzhenlin/dev/app/node-v0.10.32-darwin-x64
+export REDIS_HOME=/Users/louzhenlin/dev/server/redis-2.8.17
+#export PB_HOME=/Users/louzhenlin/dev/tools/protobuf
 
-export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin"
-export PATH=$PATH:$GOPATH/bin:$GOROOT/bin:$NSQHOME/bin:$NODEHOME/bin:$REDISHOME/bin
-export PATH=/Users/louzhenlin/dev/app/ctags-5.8/bin:$PATH
+#export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin"
+export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+#export PATH=$PATH:$GOPATH/bin:$GOROOT/bin:$NSQ_HOME/bin:$NODE_HOME/bin:$REDIS_HOME/bin:$ZOOKEEPER_HOME/bin
+#export PATH=$LUA_HOME/bin:$MAVEN_HOME/bin:$PATH
+#export PATH=$PATH:$BTRACE_HOME/bin
+
+# auto modify PATH based on APP HOME
+for app in `export | grep _HOME`
+do
+    app_path=`echo $app | cut -d = -f 2`
+    # bin folder exists
+    if [ -d $app_path'/bin' ]
+    then
+        export PATH=$PATH:$app_path'/bin'
+    fi
+done
 
 export CLICOLOR=1
 export LSCOLORS=gxfxaxdxcxegedabagacad
 
-export C_INCLUDE_PATH=/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include/
-export CPLUS_INCLUDE_PATH=/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include/
+# header include path for C and C++
+# C_INCLUDE_PATH / CPLUS_INCLUDE_PATH
+# specified by -I option
+
+# static library path for C and C++
+# LIBRARY_PATH: static library, can be specified by -L option
+# LD_LIBRARY_PATH: dynamic library, user link
+
+# include path for leveldb
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include/
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include/
 export PKG_CONFIG_PATH=/usr/local/Cellar/pkg-config/0.28/bin/pkg-config
+
+# include path for lua
+export C_INCLUDE_PATH=./:$LUA_HOME/include:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=./:$LUA_HOME/include:$CPLUS_INCLUDE_PATH
+
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/Users/louzhenlin/dev/workspace/c/infQ/src
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/Users/louzhenlin/dev/workspace/c/infQ/src
+
+# static library path for infQ
+export LIBRARY_PATH=/Users/louzhenlin/dev/workspace/c/infQ/src:/usr/local/lib
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/cuda/include
+
+# add my apps (~/dev/app) to PATH, C_INCLUDE_PATH and LIBRARY_PATH
+APP_HOME=/Users/louzhenlin/dev/app
+for app in `ls ~/dev/app`
+do
+    # skip regular files
+    if [ ! -d $APP_HOME/$app ]
+    then
+        continue
+    fi
+
+    # avoid repetition
+    if [[ $PATH =~ $app ]]
+    then
+        continue
+    fi
+
+    export PATH=$PATH:$APP_HOME/$app/bin
+
+    if [ -d "$APP_HOME/$app/include" ]
+    then
+        export C_INCLUDE_PATH=$C_INCLUDE_PATH:$APP_HOME/$app/include
+        export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$APP_HOME/$app/include
+    fi
+
+    if [ -d "$APP_HOME/$app/lib/pkgconfig" ]
+    then
+        export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$APP_HOME/$app/lib/pkgconfig
+    fi
+
+    if [ -d "$APP_HOME/$app/lib" ]
+    then
+        export LIBRARY_PATH=$LIBRARY_PATH:$APP_HOME/$app/lib
+    fi
+done
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/cuda/lib
 
 # MANPATH
 LOCAL_MANPATH="/Users/louzhenlin/dev/man"
@@ -103,9 +185,15 @@ LOCAL_MANPATH="/Users/louzhenlin/dev/man"
 alias ll="ls -al"
 alias grep="grep --color"
 alias rm="safe_rm"
+alias rawrm="/bin/rm"
 
 alias g108="ssh root@202.205.91.108"
 alias g107="ssh root@202.205.91.107"
+alias g222="ssh root@202.205.93.222"
+
+function g() {
+    ssh root@202.205.91.$1
+}
 
 # edit and source private config
 alias erc="vim ~/.zshrc"
@@ -115,19 +203,28 @@ alias src="source ~/.zshrc"
 alias manlocal="man -M $LOCAL_MANPATH"
 alias addman="cp -a man/* $LOCAL_MANPATH"
 
-# user macvim
-alias vi="/usr/local/Cellar/macvim/HEAD/MacVim.app/Contents/MacOS/Vim"
-alias vim="/usr/local/Cellar/macvim/HEAD/MacVim.app/Contents/MacOS/Vim"
+# use macvim
+alias vi="/Applications/MacVim.app/Contents/MacOS/Vim"
+alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
 
 # handy tools
 alias cwd="pwd | pbcopy"
+
+# start a local server at current directory
+alias lserver="python -m SimpleHTTPServer"
+
+alias cgotags="gotags -R=true -f=tags ."
+alias cctags="ctags -R *"
+
+alias lftree="ftree -l -r"
+alias sys_headers='cd /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include'
 
 source /Users/louzhenlin/dev/tools/z/z.sh
 
 # functions
 # compile leveldb app
 function mklvdb() {
-    g++ -o $2 $1 /Users/louzhenlin/dev/workspace/c_cpp/leveldb/libleveldb.a -I/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include -lpthread
+    g++ -g -ggdb -o $2 $1 /usr/local/lib/libsnappy.a /Users/louzhenlin/dev/workspace/c_cpp/leveldb/libleveldb.a -I/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include -lpthread
 }
 
 # init workspace for go
@@ -144,12 +241,32 @@ function goworkspace() {
     echo "finish creation of bin"
 }
 
+COMMENT_SPACE_PATTERN="(/\*)|(\*/)|(^\s*\*)|(\/\/)|(^\s*$)"
+
 # calc code lines for C
 function clines() {
-    cc_line=`find . -name '*.c' | xargs grep -v '^$' | grep -v '//' | grep -v '/\*' | grep -v '\*/'| grep -v ' \*' | wc -l | awk '{print $1}'`
-    h_line=`find . -name '*.h' | xargs grep -v '^$' | grep -v '//' | grep -v '/\*' | grep -v '\*/'| grep -v ' \*' | wc -l | awk '{print $1}'`
+    lines=`find -E . -regex "(.*\.c$)|(.*.h$)" |xargs grep -E -v "$COMMENT_SPACE_PATTERN" | wc -l | awk '{print $1}'`
+    echo $lines
+}
 
-    lines=`expr $cc_line + $h_line`
+# calc code lines for C
+function cpplines() {
+    lines=`find -E . -regex "(.*\.cc$)|(.*\.cpp$)|(.*\.hpp$)|(.*\.h$)" | xargs grep -E -v "$COMMENT_SPACE_PATTERN" | wc -l | awk '{print $1}'`
+    echo $lines
+}
+
+function golines() {
+    lines=`find . -name '*.go' | xargs grep -E -v "$COMMENT_SPACE_PATTERN" | wc -l | awk '{print $1}'`
+    echo $lines
+}
+
+function javalines() {
+    lines=`find . -name '*.java' | xargs grep -E -v "$COMMENT_SPACE_PATTERN" | wc -l | awk '{print $1}'`
+    echo $lines
+}
+
+function pylines() {
+    lines=`find . -name '*.py' | xargs grep -E -v "(^\s*$)|(#)|(''')" | wc -l | awk '{print $1}'`
     echo $lines
 }
 
@@ -158,17 +275,22 @@ function kpn() {
     ps axu | grep $1 | grep -v grep | awk '{print $2}' | xargs kill
 }
 
+# grep process by name
+function pn() {
+    ps axu | grep $1 | grep -v grep
+}
+
 # safe rm
 # Don't remove the file, just move them to a temporary directory.
 # Files are grouped by remove time.
 # e.g.
 #   # pwd => /home/work/
 #   > rm -r -f aa
-#   'aa' will move to ~/.TrashHistory/20141018/aa@120111@_home_work_aa
-RM_BACKUP_PATH=/Users/louzhenlin/.TrashHistory
+#   'aa' will move to ~/.TrashHistory/20141018/aa@120111@^home^work^aa
+_RM_BACKUP_PATH=/Users/louzhenlin/.TrashHistory
 function safe_rm() {
     # skip cmd option, e.g. '-rf' in 'rm -rf a b' or '-r/-f' in 'rm -r -f a b'
-    first_char=${1:0:1}
+    local first_char=${1:0:1}
     until [ ! "$first_char" = "-" ]
     do
         shift
@@ -181,11 +303,11 @@ function safe_rm() {
         exit 1
     fi
 
-    today=`date +"%Y%m%d"`
-    mvpath=${RM_BACKUP_PATH}/$today
+    local today=`date +"%Y%m%d"`
+    local mvpath=${_RM_BACKUP_PATH}/$today
 
     # support for multi version
-    timestamp=`date +"%H%M%S"`
+    local timestamp=`date +"%H%M%S"`
 
     # create dir if path non-exist
     if [ ! -d $mvpath ]; then
@@ -195,47 +317,47 @@ function safe_rm() {
     until [ $# -eq 0 ]
     do
         # fetch absolute path of the file
-        fpath=$1
-        fchar=`echo "${fpath:0:1}"`
+        local file_path=$1
+        local fchar=`echo "${file_path:0:1}"`
         if [ "$fchar" = "/" ]; then
-            dist_path="_${fpath}"
+            local abs_fpath="${file_path}"
         else
-            abs_fpath=`pwd`/$fpath
-            dist_path="${fpath}@${timestamp}@${abs_fpath}"
+            local abs_fpath=`pwd`/$file_path
         fi
+        local file_name=`basename $file_path`
+        local dist_path="${file_name}@${timestamp}@${abs_fpath}"
 
-        # substitue '/' to '_'
-        final_dist_path=${dist_path//\//_}
+        # substitue '/' to '^'
+        local final_dist_path=${dist_path//\//^}
 
         # mv to temp trash
-        mv $fpath $mvpath/$final_dist_path
+        mv $file_path $mvpath/$final_dist_path
 
         # next file
         shift
     done
 }
 
-
 # revert files that remove by safe_rm
 # you can choose the right one in multi files removed
+# e.g.:
+#   revert_rm service
 function revert_rm() {
-    cd $RM_BACKUP_PATH
-
     # process multi files
     until [ $# -eq 0 ]
     do
         echo "revert for $1:"
-        for f in `find . -name "$1@*" -print`
+        for _f in `find $_RM_BACKUP_PATH -name "*$1*@*" -print`
         do
-            d=`echo $f | awk -F\/ '{print $2}'`
-            t=`echo $f | awk -F@ '{print $2}'`
-            fpath=`echo $f | awk -F@ '{print $3}'`
-            fpath=${fpath//_/\/}
+            local d=`echo $_f | cut -d / -f 5`
+            local t=`echo $_f | cut -d @ -f 2`
+            local file_path=`echo $_f | awk -F@ '{print $3}'`
+            file_path=${file_path//\^/\/}
 
-            echo -n "      $fpath at ${d:0:4}-${d:4:2}-${d:6:2} ${t:0:2}:${t:2:2}:${t:4:2}   [y/n]? "
-            read confirm
-            if [ "${confirm}" = 'y' ]; then
-                mv $f $fpath
+            echo -n "      $file_path removed at ${d:0:4}-${d:4:2}-${d:6:2} ${t:0:2}:${t:2:2}:${t:4:2}   [y/n]? "
+            read _confirm
+            if [ "${_confirm}" = 'y' ]; then
+                mv $_f $file_path
                 break
             fi
         done
@@ -244,4 +366,33 @@ function revert_rm() {
     done
 }
 
+# force remove files in .TrashHistory
+# USAGE: clear_trash gologging_file*
+function clear_trash() {
+    if [ $# -lt 1 ]; then
+        echo "USAGE: clear_trash NAME_PATTERN"
+    fi
 
+    find $_RM_BACKUP_PATH -name "$1*" -print -exec /bin/rm {} \;
+}
+
+# first search built in man path
+# if non-exist, search local man path
+function manr() {
+    man $1
+    if [ $? -ne 0 ]; then
+        manlocal $1
+    fi
+}
+
+
+function momogit() {
+    git config --local user.name "娄振林"
+    git config --local user.email "lou.zhenlin@immomo.com"
+}
+
+# mkdir and cd
+function mkcdir() {
+    mkdir -p $1
+    cd $1
+}
