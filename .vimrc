@@ -95,6 +95,7 @@ set hlsearch
 set laststatus=2
 set wildmenu
 set updatetime=100
+set hidden
 
 " filetype
 filetype on
