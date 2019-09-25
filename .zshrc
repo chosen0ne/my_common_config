@@ -396,3 +396,9 @@ function mkcdir() {
     mkdir -p $1
     cd $1
 }
+
+# fuzzy find
+# https://github.com/junegunn/fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'

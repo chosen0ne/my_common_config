@@ -166,9 +166,9 @@ inoremap <leader>{}     {}<left><Enter><Enter><up><tab>
 nnoremap <leader>uw     viw~
 
 " mapping for common func
-nnoremap <leader>q      :q<CR>
-nnoremap <leader>qa     :qa<CR>
-nnoremap <leader>qw     :wq<CR>
+nnoremap <leader>q      :q<cr>
+nnoremap <leader>qa     :qa<cr>
+nnoremap <leader>qw     :wq<cr>
 
 " mapping for win operation
 "" make full window
@@ -200,7 +200,12 @@ inoremap <leader>pd <esc>koimport pdb; pdb.set_trace()<esc>:w<cr>
 "onoremap <leader>li( :<c-u>normal! F)vi(<cr>
 "" select header in Markdown
 onoremap <leader>ih :<c-u>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<cr>
+"" inner entire buffer
+onoremap ie :<c-u>execute "normal! ggVG"<cr>
+"" current viewable text in the buffer
+onoremap iv :<c-u>execute "normal! HVL"<cr>
 
+" select content in pairs
 inoremap <leader>ni( <esc>f(vi(
 inoremap <leader>ni{ <esc>f{vi{
 inoremap <leader>ni< <esc>f<vi<
@@ -224,11 +229,11 @@ inoremap <leader>pa" <esc>F"va"
 
 
 " mappings for buffer
-nnoremap <leader>fn :bnext<CR>
-nnoremap <leader>fp :bprevious<CR>
-nnoremap <leader>fq :bp <BAR> bd #<CR>
-nnoremap <leader>fl :ls<CR>
-nnoremap <leader>fe :enew<CR>
+nnoremap <leader>fn :bnext<cr>
+nnoremap <leader>fp :bprevious<cr>
+nnoremap <leader>fq :bp <BAR> bd #<cr>
+nnoremap <leader>fl :ls<cr>
+nnoremap <leader>fe :enew<cr>
 
 
 "========================================= Abbreviations ==========================================================
@@ -276,7 +281,7 @@ augroup END
 
 augroup golang
     autocmd!
-    au FileType go nmap :run <Plug>(go-run)
+    au FileType go nmap <leader>r <Plug>(go-run)
     au FileType go nmap <leader>b <Plug>(go-build)
     au FileType go nmap <leader>t <Plug>(go-test)
     au FileType go nmap <leader>c <Plug>(go-coverage)
@@ -390,11 +395,11 @@ let NERDTreeWinSize=20
 " <C> + j / k: navigate result list
 "==================================================================================================================
 " find file
-noremap <leader>ff  :CtrlP<CR>
+noremap <leader>ff  :CtrlP<cr>
 " find buffer
-noremap <leader>fb  :CtrlPBuffer<CR>
+noremap <leader>fb  :CtrlPBuffer<cr>
 " find MRU
-noremap <leader>fm  :CtrlPMRU<CR>
+noremap <leader>fm  :CtrlPMRU<cr>
 let g:ctrlp_working_path_mode = 'ra'
 set wildignore+=*/tmp/*,*.so,*.swo,*.swp,*.zip,*.o,*.a,*.pyc     " MacOSX/Linux
 let g:ctrlp_custom_ignore = {
@@ -426,7 +431,7 @@ let g:syntastic_python_checkers = ['flake8']
 "Gundo: undo tree view -----{{{
 "https://github.com/sjl/gundo.vim
 "==================================================================================================================
-noremap <leader>gu  :GundoToggle<CR>
+noremap <leader>gu  :GundoToggle<cr>
 
 let g:gundo_width = 60              " horizontal width of Gundo graph
 let g:gundo_preview_height = 40     " vertial height of Gundo preview
@@ -531,7 +536,7 @@ let g:airline#extensions#tabline#fnamemod=':t'
 "==================================================================================================================
 let g:tagbar_width=25
 let g:tagbar_ctags_bin = "/Users/louzhenlin/dev/app/ctags-5.8/bin/ctags"
-nmap <leader>tb :TagbarToggle<CR>
+nmap <leader>tb :TagbarToggle<cr>
 " support golang
 let g:tagbar_type_go = {
     \ 'ctagstype' : 'go',
@@ -619,11 +624,11 @@ let g:EasyMotion_smartcase = 1      " similarly to Vim's smartcase option for gl
 "==================================================================================================================
 if exists(":Tabularize")
     " align by =
-    nmap <leader>t= :Tabularize /=<CR>
-    vmap <leader>t= :Tabularize /=<CR>
+    nmap <leader>t= :Tabularize /=<cr>
+    vmap <leader>t= :Tabularize /=<cr>
     " align by :
-    nmap <leader>t: :Tabularize /:\zs<CR>
-    vmap <leader>t: :Tabularize /:\zs<CR>
+    nmap <leader>t: :Tabularize /:\zs<cr>
+    vmap <leader>t: :Tabularize /:\zs<cr>
 endif
 " }}}
 
@@ -648,8 +653,8 @@ endif
 "==================================================================================================================
 " nmap ]h <Plug>GitGutterNextHunk
 " nmap [h <Plug>GitGutterPrevHunk
-" nnoremap <leader>gt :GitGutterToggle<CR>
-" nnoremap <leader>gst :GitGutterSignsToggle<CR>
+" nnoremap <leader>gt :GitGutterToggle<cr>
+" nnoremap <leader>gst :GitGutterSignsToggle<cr>
 " let g:gitgutter_max_signs=10240
 "  }}}
 
@@ -668,8 +673,8 @@ endif
 "==================================================================================================================
 "vimshell read ~/.vimshrc as init file
 " :VimShell     => open shell
-nnoremap <leader>sh :VimShellPop<CR>
-nnoremap <leader>sht :VimShellTab<CR>
+nnoremap <leader>sh :VimShellPop<cr>
+nnoremap <leader>sht :VimShellTab<cr>
 " }}}
 
 
@@ -699,8 +704,8 @@ let g:DirDiffExcludes = "*.swp,*.swo*.class,*.pyc,*.a,*.o"
 "
 "==================================================================================================================
 " recompile
-nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>
-nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <F5> :YcmForceCompileAndDiagnostics<cr>
+nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 " For C-family languages this only works in certain situations, namely when
 " the definition of the symbol is in the current translation unit. A
 " translation unit consists of the file you are editing and all the files you
@@ -711,21 +716,21 @@ nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 " ctags can be used at the situation.
 "   <C> + ]     => jump to
 "   <C> + t     => jump back
-nnoremap <leader>jf :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>jg :YcmCompleter GoTo<CR>
+nnoremap <leader>jf :YcmCompleter GoToDefinition<cr>
+nnoremap <leader>jg :YcmCompleter GoTo<cr>
 " jump to the included file when current line is a #include
 " supported: c-family
-nnoremap <leader>jh :YcmCompleter GoToInclude<CR>
+nnoremap <leader>jh :YcmCompleter GoToInclude<cr>
 " supported: java, javascript, python, typescript
-nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
+nnoremap <leader>jr :YcmCompleter GoToReferences<cr>
 " Echos the type of the variable or method under the cursor, and where it
 " differs, the derived type.
 " supported: c-family, java, javascript, typescript
-nnoremap <leader>gt :YcmCompleter GetType<CR>
+nnoremap <leader>gt :YcmCompleter GetType<cr>
 " Displays the preview window populated with quick info about the identifier
 " under the cursor.
 " supported: c-family, java, javascript, python, typescript, rust
-nnoremap <leader>gd :YcmCompleter GetDoc<CR>
+nnoremap <leader>gd :YcmCompleter GetDoc<cr>
 
 " global ycm conf
 autocmd FileType cpp let g:ycm_global_ycm_extra_conf='~/.vim/ycm_conf/cpp/.ycm_extra_conf.py'
@@ -847,14 +852,14 @@ endfunction
 " :IHV vertical splits and switches
 " :IHT new tab and switches
 " :IHN cycles through matches
-" <Leader>ih switches to file under cursor
-" <Leader>is switches to the alternate file of file under cursor (e.g. on
+" <leader>ih switches to file under cursor
+" <leader>is switches to the alternate file of file under cursor (e.g. on
 " <foo.h> switches to foo.cpp)
-" <Leader>ihn cycles through matches
+" <leader>ihn cycles through matches
 "==================================================================================================================
-nnoremap <leader>h :A<CR>
-nnoremap <leader>hv :AV<CR>
-nnoremap <leader>hs :AS<CR>
+nnoremap <leader>h :A<cr>
+nnoremap <leader>hv :AV<cr>
+nnoremap <leader>hs :AS<cr>
 " }}}
 
 
@@ -873,7 +878,7 @@ let g:tlTokenList = ['FIXME', 'TODO', 'XXX', '<MM>', '<MW>']
 "==================================================================================================================
 let s:numbers_exclude = ['tagbar', 'gundo', 'nerdtree']
 " switch between default number and Numbers(relative number)
-nnoremap <leader>sn :NumbersToggle<CR>NumbersToggle<CR>:set number<CR>
+nnoremap <leader>sn :NumbersToggle<cr>NumbersToggle<cr>:set number<cr>
 " }}}
 
 
