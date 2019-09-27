@@ -68,18 +68,21 @@ export ZOOKEEPER_HOME=/Users/louzhenlin/dev/server/zookeeper-3.4.6
 export NSQ_HOME=/Users/louzhenlin/dev/server/nsq-0.2.31.darwin-amd64.go1.3.1
 export NODE_HOME=/Users/louzhenlin/dev/app/node-v0.10.32-darwin-x64
 export REDIS_HOME=/Users/louzhenlin/dev/server/redis-2.8.17
-#export PB_HOME=/Users/louzhenlin/dev/tools/protobuf
 
-#export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/opt/X11/bin"
 export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
-#export PATH=$PATH:$GOPATH/bin:$GOROOT/bin:$NSQ_HOME/bin:$NODE_HOME/bin:$REDIS_HOME/bin:$ZOOKEEPER_HOME/bin
-#export PATH=$LUA_HOME/bin:$MAVEN_HOME/bin:$PATH
-#export PATH=$PATH:$BTRACE_HOME/bin
 
 # auto modify PATH based on APP HOME
 for app in `export | grep _HOME`
 do
     app_path=`echo $app | cut -d = -f 2`
+
+    # avoid repetition
+    if [[ $PATH =~ $app_path ]]
+    then
+        continue
+    fi
+
     # bin folder exists
     if [ -d $app_path'/bin' ]
     then
@@ -101,7 +104,7 @@ export LSCOLORS=gxfxaxdxcxegedabagacad
 # include path for leveldb
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include/
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/Users/louzhenlin/dev/workspace/c_cpp/leveldb/include/
-export PKG_CONFIG_PATH=/usr/local/Cellar/pkg-config/0.28/bin/pkg-config
+unset PKG_CONFIG_PATH
 
 # include path for lua
 export C_INCLUDE_PATH=./:$LUA_HOME/include:$C_INCLUDE_PATH
@@ -114,12 +117,13 @@ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/Users/louzhenlin/dev/workspace/c/
 export LIBRARY_PATH=/Users/louzhenlin/dev/workspace/c/infQ/src:/usr/local/lib
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/cuda/include
 
-# add my apps (~/dev/app) to PATH, C_INCLUDE_PATH and LIBRARY_PATH
-APP_HOME=/Users/louzhenlin/dev/app
-for app in `ls ~/dev/app`
-do
+# add bin/, lib/, include/ to env for a app
+function init_app() {
+    local app_home
+    app_home=$1
+
     # skip regular files
-    if [ ! -d $APP_HOME/$app ]
+    if [ ! -d $app_home ]
     then
         continue
     fi
@@ -130,23 +134,39 @@ do
         continue
     fi
 
-    export PATH=$PATH:$APP_HOME/$app/bin
+    export PATH=$PATH:$app_home/bin
 
-    if [ -d "$APP_HOME/$app/include" ]
+    if [ -d "$app_home/include" ]
     then
-        export C_INCLUDE_PATH=$C_INCLUDE_PATH:$APP_HOME/$app/include
-        export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$APP_HOME/$app/include
+        export C_INCLUDE_PATH=$C_INCLUDE_PATH:$app_home/include
+        export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$app_home/include
     fi
 
-    if [ -d "$APP_HOME/$app/lib/pkgconfig" ]
+    if [ -d "$app_home/lib/pkgconfig" ]
     then
-        export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$APP_HOME/$app/lib/pkgconfig
+        export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$app_home/lib/pkgconfig
     fi
 
-    if [ -d "$APP_HOME/$app/lib" ]
+    if [ -d "$app_home/lib" ]
     then
-        export LIBRARY_PATH=$LIBRARY_PATH:$APP_HOME/$app/lib
+        export LIBRARY_PATH=$LIBRARY_PATH:$app_home/lib
     fi
+}
+
+# add my apps (~/dev/app) to PATH, C_INCLUDE_PATH and LIBRARY_PATH
+APPS_HOME=/Users/louzhenlin/dev/app
+for app in `ls ~/dev/app`
+do
+    app_home=$APPS_HOME/$app
+    init_app $app_home
+done
+
+# add app in homebrew to PATH, C_INCLUDE_PATH and LIBRARY_PATH
+for app in `ls /usr/local/Cellar/`
+do
+    version=`ls -lt /usr/local/Cellar/$app | grep -v total | head -n 1 | awk '{print $9}'`
+    app_home=/usr/local/Cellar/"$app"/"$version"
+    init_app $app_home
 done
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib

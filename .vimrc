@@ -45,7 +45,6 @@ Plugin 'Valloric/YouCompleteMe'
 " Plugin 'klen/python-mode'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
-Plugin 'vim-scripts/L9'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'plasticboy/vim-markdown'
 Plugin 'elzr/vim-json'
@@ -56,6 +55,7 @@ Plugin 'myusuf3/numbers.vim'
 Plugin 'bronson/vim-trailing-whitespace'
 Plugin 'mdempsky/gocode', {'rtp': 'vim/'}
 Plugin 'rust-lang/rust.vim'
+"" search Dash.app from vim
 Plugin 'rizzatti/dash.vim'
 Plugin 'bkad/CamelCaseMotion'
 Plugin 'vim-scripts/argtextobj.vim'
@@ -63,12 +63,18 @@ Plugin 'michaeljsmith/vim-indent-object'
 Plugin 'tpope/vim-speeddating'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+
+Plugin 'svermeulen/vim-subversive'
+Plugin 'tpope/vim-abolish'
+"" code completion use depp learning
+"Plugin 'zxqfl/tabnine-vim'
+
+"" colorscheme
 Plugin 'dracula/vim'
 Plugin 'morhetz/gruvbox'
 Plugin 'tomasr/molokai'
-Plugin 'svermeulen/vim-subversive'
-Plugin 'zxqfl/tabnine-vim'
-Plugin 'tpope/vim-abolish'
+
+"Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 " All of your Plugins must be added before the following line
 call vundle#end()
 "============================================== END ===============================================================
@@ -178,6 +184,10 @@ noremap <C-J>     <C-W>j
 noremap <C-K>     <C-W>k
 noremap <C-H>     <C-W>h
 noremap <C-L>     <C-W>l
+"" scroll window down 20 lines, cursor is fixed
+noremap <leader>we 20<C-E>
+"" scroll window up 20 lines, cursor is fixed
+noremap <leader>wy 20<C-Y>
 
 " advance mapping config
 "" [local word]search word at cursor in current file, and emit to quickfix win
@@ -281,10 +291,10 @@ augroup END
 
 augroup golang
     autocmd!
-    au FileType go nmap <leader>r <Plug>(go-run)
-    au FileType go nmap <leader>b <Plug>(go-build)
-    au FileType go nmap <leader>t <Plug>(go-test)
-    au FileType go nmap <leader>c <Plug>(go-coverage)
+    au FileType go nmap <leader>gr <Plug>(go-run)
+    au FileType go nmap <leader>gb <Plug>(go-build)
+    au FileType go nmap <leader>gt <Plug>(go-test)
+    au FileType go nmap <leader>gc <Plug>(go-coverage)
 augroup END
 
 " }}}
@@ -326,6 +336,33 @@ augroup END
 " <C> + ]   =>
 " <C> + T   =>
 "==================================================================================================================
+" }}}
+
+
+"===========================================Color Scheme===========================================================
+"==================================================================================================================
+"Molokai: color scheme -----{{{
+"https://github.com/tomasr/molokai
+"==================================================================================================================
+let g:molokai_original = 1
+"colorscheme molokai
+" }}}
+
+
+"==================================================================================================================
+"Gruvbox: color scheme -----{{{
+"https://github.com/morhetz/gruvbox
+"==================================================================================================================
+colorscheme gruvbox
+" }}}
+
+
+"==================================================================================================================
+"Dracula: color scheme -----{{{
+"https://github.com/dracula/vim
+"==================================================================================================================
+" too light
+"colorscheme dracula
 " }}}
 
 
@@ -457,23 +494,6 @@ let g:indent_guides_auto_colors = 0
 let g:indent_guides_guide_size = 1
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=3
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=gray ctermbg=4
-" }}}
-
-
-"==================================================================================================================
-"Molokai: color scheme -----{{{
-"https://github.com/tomasr/molokai
-"==================================================================================================================
-let g:molokai_original = 1
-"colorscheme molokai
-" }}}
-
-
-"==================================================================================================================
-"Gruvbox: color scheme -----{{{
-"https://github.com/morhetz/gruvbox
-"==================================================================================================================
-colorscheme gruvbox
 " }}}
 
 
@@ -978,4 +998,15 @@ nmap <leader><leader>rr <plug>(SubversiveSubstituteWordRange)
 "Abolish: easily search for, substitute, and abbreviate multiple variants of a word ------{{{
 "https://github.com/tpope/vim-abolish
 ""
+" }}}
+
+
+"==================================================================================================================
+"Vim_multiple_cursors: True Sublime Text style multiple selections for Vim
+"https://github.com/terryma/vim-multiple-cursors
+" <c-n>: add a new virtual cursor + selection on the next match
+" <c-x>: skip the next match
+" <c-p>: remove current virtual cursor + selection and go back on previous match
+" v: go to normal model
+" <esc>: back to regular vim
 " }}}
