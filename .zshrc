@@ -60,7 +60,7 @@ export GOSRC=/usr/local/go/src/pkg
 export GOPATH=/Users/louzhenlin/dev/workspace/go
 
 # APP HOME
-export JAVA_HOME=`/usr/libexec/java_home`
+#export JAVA_HOME=`/usr/libexec/java_home`
 export MAVEN_HOME=/Users/louzhenlin/dev/downloads/apache-maven-3.2.3
 export LUA_HOME=/Users/louzhenlin/dev/app/lua-5.2.3
 export BTRACE_HOME=/Users/louzhenlin/dev/tools/btrace
@@ -203,15 +203,12 @@ LOCAL_MANPATH="/Users/louzhenlin/dev/man"
 
 # commands
 alias ll="ls -al"
-alias grep="grep --color"
+alias grep="egrep --color"
 alias rm="safe_rm"
 alias rawrm="/bin/rm"
 
-alias g108="ssh root@202.205.91.108"
-alias g107="ssh root@202.205.91.107"
-alias g222="ssh root@202.205.93.222"
-
-function g() {
+# 108/107/{143..146}/222
+function goto() {
     ssh root@202.205.91.$1
 }
 
@@ -417,8 +414,32 @@ function mkcdir() {
     cd $1
 }
 
+# ssh tunel
+function open_remote_mysql() {
+    if [ "$1" -eq '108' ]; then
+        ssh -l root -L 3306:localhost:7001 202.205.91.144 -N 108-mysql > /dev/null 2>&1 &
+        ssh root@202.205.91.144 'ssh -l root -L 7001:localhost:3306 202.205.91.108 -N 108-mysql &' > /dev/null 2>&1 &
+    elif [ "$1" = '144' ]; then
+        ssh -l root -L 3306:localhost:3306 202.205.91.144 -N 144-mysql > /dev/null 2>&1 &
+    fi
+}
+
+function close_remote_mysql() {
+    if [ "$1" = '108' ]; then
+        kpn 108-mysql
+        ssh root@202.205.91.144 "ps axu | grep 108-mysql | grep -v grep | awk '{print \$2}' | xargs kill"
+    elif [ "$1" = '144' ]; then
+        kpn 144-mysql
+    fi
+}
+
 # fuzzy find
 # https://github.com/junegunn/fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+
+# config for jenv
+# ref: http://www.jenv.be/
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
